@@ -12,10 +12,10 @@ INCLUDEDIR = ../../lib/SDL2-2.0.9/include
 INCLUDEDIR3 = ../../lib/rtmidi-4.0.0
 INCLUDEDIR4 = ../../lib/SDL2_mixer-2.0.4
 LIBDIR = /usr/lib
-LIBDIR2 = ../../lib/SDL2-2.0.9/lib/x64
-LIBDIR3 = ../../lib/SDL2_mixer-2.0.4/lib/x64
-LIBDIR4 = ../../lib
-LIBDIR5 = ../../lib/rtmidi-4.0.0
+LIBDIR2 = ../../lib/SDL2-2.0.9/build/.libs/
+LIBDIR3 = ../../lib/SDL2_mixer-2.0.4/build/.libs/
+LIBDIR4 = ../../lib/rtmidi-4.0.0/.libs/
+LIBDIR5 = ../../lib/SDL2_ttf-2.0.15/.libs
 
 # Object files
 OBJECTS = wxDrumPad.o DrumPads.o DrumPadsApp.o ../wxAudioControls/wxSettingsFile.o ../wxAudioControls/wxMidiSettingsDlg.o ../wxAudioControls/wxSwitch.o ../wxAudioControls/wxBitmapSpinButton.o ../wxAudioControls/wxKeylessChoice.o $(INCLUDEDIR3)/RtMidi.o
@@ -31,7 +31,7 @@ CXX = $(shell $(WX_CONFIG) --cxx -O3)
 all:    $(PROGRAM)
 
 $(PROGRAM):	$(OBJECTS)
-	$(CXX) -D__MACOSX_CORE__ -o $(PROGRAM) $(OBJECTS) -L$(LIBDIR) -L$(LIBDIR2) -L$(LIBDIR3) -L$(LIBDIR4) -L$(LIBDIR5) `$(WX_CONFIG) --libs` -lportaudio -lpthread -lSDL2 -F../../lib/SDL2_ttf.framework -lSDL2_mixer -lrtmidi -framework CoreMidi -framework CoreAudio -framework CoreFoundation
+	$(CXX) -D__MACOSX_CORE__ -o $(PROGRAM) $(OBJECTS) -L$(LIBDIR) -L$(LIBDIR2) -L$(LIBDIR3) -L$(LIBDIR4) -L$(LIBDIR5) `$(WX_CONFIG) --libs` -lpthread -lSDL2 -lSDL2_ttf -lSDL2_mixer -lrtmidi -framework CoreMidi -framework CoreAudio -framework CoreFoundation
 
 clean: 
 	rm -f *.o $(PROGRAM) $(INCLUDEDIR3)/*.o
