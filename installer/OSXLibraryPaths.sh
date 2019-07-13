@@ -31,5 +31,6 @@ install_name_tool -change /usr/local/lib/libwx_osx_cocoau_adv-3.1.2.0.0.dylib @e
 # SDL2 references to other SDL2 libraries.
 install_name_tool -change /usr/local/lib/libSDL2-2.0.0.dylib @executable_path/../Frameworks/libSDL2-2.0.0.dylib DrumPads.app/Contents/Frameworks/libSDL2_mixer-2.0.0.dylib
 install_name_tool -change /usr/local/lib/libSDL2-2.0.0.dylib @executable_path/../Frameworks/libSDL2-2.0.0.dylib DrumPads.app/Contents/Frameworks/libSDL2_ttf-2.0.0.dylib
+install_name_tool -change /usr/local/lib/libfreetype.6.dylib @executable_path/../Frameworks/libfreetype.6.dylib DrumPads.app/Contents/Frameworks/libSDL2_ttf-2.0.0.dylib
 echo "Current Library Paths on DrumPads.app/Contents/MacOS/DrumPads:"
 otool -L DrumPads.app/Contents/MacOS/DrumPads
