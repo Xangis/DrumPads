@@ -287,7 +287,7 @@ bool DrumPads::InitializeAudio()
 #ifdef linux
     wxString dirname = wxString(_("./samples"));
 #elif __APPLE__
-    wxString dirname = wxString(_(".\\samples"));
+    wxString dirname = wxString::Format(_("%s/samples/"), wxStandardPaths::Get().GetResourcesDir());
 #else
     wxString dirname = wxString::Format(_("%s/samples"), wxStandardPaths::Get().GetResourcesDir());
 #endif
@@ -328,7 +328,7 @@ bool DrumPads::InitializeAudio()
 #ifndef __APPLE__
 			wxString fileName = wxString::Format(_("samples\\%s"), _waveFileNames[_sampleSetting[i]]);
 #else
-	                wxString fileName = wxString::Format(_("%s/samples/%s"), wxStandardPaths::Get().GetResourcesDir(), _waveFileNames[_sampleSetting[i]]);
+	        wxString fileName = wxString::Format(_("%s/samples/%s"), wxStandardPaths::Get().GetResourcesDir(), _waveFileNames[_sampleSetting[i]]);
 #endif
 			_sample[i] = Mix_LoadWAV(fileName.mb_str().data());
 			if( _sample[i] == NULL )
@@ -532,7 +532,7 @@ void DrumPads::OnLoad( wxCommandEvent& )
 #ifndef __APPLE__
 				wxString fileName = wxString::Format(_("samples\\%s"), _waveFileNames[_sampleSetting[i]]);
 #else
-                                wxString fileName = wxString::Format(_("%s/samples/%s"), wxStandardPaths::Get().GetResourcesDir(), _waveFileNames[_sampleSetting[i]]);
+                wxString fileName = wxString::Format(_("%s/samples/%s"), wxStandardPaths::Get().GetResourcesDir(), _waveFileNames[_sampleSetting[i]]);
 #endif
 				_sample[i] = Mix_LoadWAV(fileName.mb_str().data());
 				wxString title = wxFileName(_waveFileNames[_sampleSetting[i]]).GetName();

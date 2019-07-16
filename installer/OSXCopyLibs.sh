@@ -12,3 +12,6 @@ cp /usr/local/lib/libwx_osx_cocoau_xrc-3.1.dylib DrumPads.app/Contents/Framework
 cp /usr/local/lib/libwx_baseu-3.1.dylib DrumPads.app/Contents/Frameworks/
 cp ../../../lib/SDL2_ttf-2.0.15/.libs/libSDL2_ttf-2.0.0.dylib DrumPads.app/Contents/Frameworks/
 cp ../../../lib/rtmidi-4.0.0/.libs/librtmidi.5.dylib DrumPads.app/Contents/Frameworks/
+# Copy samples (they're not libs, but should be copied now)
+mkdir -p DrumPads.app/Contents/Resources/Samples/
+cp -R ../samples_v2/*.wav DrumPads.app/Contents/Resources/Samples/
