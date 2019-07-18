@@ -17,6 +17,8 @@
 //#include "aeffectx.h"
 //#include "audioeffectx.h"
 //#endif
+#include "wx/fs_zip.h"
+#include "wx/html/helpctrl.h"
 #include "DrumCallback.h"
 #include "wxDrumPad.h"
 #include "../wxAudioControls/MidiSettingsInterface.h"
@@ -117,7 +119,7 @@
 #endif
 
 //class DrumPads: public wxDialog, public DrumCallback, public MidiSettingsInterface, public AudioSettingsInterface
-class DrumPads: public wxDialog, public DrumCallback, public MidiSettingsInterface
+class DrumPads: public wxFrame, public DrumCallback, public MidiSettingsInterface
 {
     DECLARE_DYNAMIC_CLASS( DrumPads )
     DECLARE_EVENT_TABLE()
@@ -154,11 +156,14 @@ public:
 	void OnSave( wxCommandEvent& event );
 	void OnLoad( wxCommandEvent& event );
 	void OnLock( wxCommandEvent& event );
+    void OnInfo( wxCommandEvent& event );
+    void OnHelp( wxCommandEvent& event );
 	void OnMidiSettings( wxCommandEvent& event );
 	void AllNotesOff( bool receivedFromMidi = false );
     void SendMidiMessage( unsigned char byte1, unsigned char byte2, unsigned char byte3, unsigned char byte4, bool shortmsg = false );
     void ProcessMidiMessage(unsigned char byte1, unsigned char byte2, unsigned char byte3, unsigned char byte4);
 private:
+    wxHtmlHelpController* _helpCtrl;
     wxDrumPad* _pads[MAX_PADS];
     Mix_Chunk* _sample[NUM_PADS];
     unsigned int _sampleSetting[NUM_PADS];
