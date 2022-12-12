@@ -14,13 +14,14 @@
 #include "wx/dir.h"
 #include "wx/filename.h"
 #include "wx/stdpaths.h"
+#include "wx/aboutdlg.h"
 
 // The MIDI note to start with (for the first pad)
 #define MIDI_OFFSET 36
 
-IMPLEMENT_DYNAMIC_CLASS( DrumPads, wxDialog )
+IMPLEMENT_DYNAMIC_CLASS( DrumPads, wxFrame )
 
-BEGIN_EVENT_TABLE( DrumPads, wxDialog )
+BEGIN_EVENT_TABLE( DrumPads, wxFrame )
     EVT_CLOSE( DrumPads::OnCloseWindow )
     EVT_KEY_DOWN( DrumPads::OnKeyDown )
     EVT_KEY_UP( DrumPads::OnKeyUp )
@@ -29,6 +30,8 @@ BEGIN_EVENT_TABLE( DrumPads, wxDialog )
 	EVT_BUTTON( ID_SAVEBUTTON, DrumPads::OnSave )
 	EVT_BUTTON( ID_LOADBUTTON, DrumPads::OnLoad )
 	EVT_BUTTON( ID_LOCKBUTTON, DrumPads::OnLock )
+    EVT_MENU( wxID_ABOUT, DrumPads::OnInfo )
+    EVT_MENU( wxID_HELP, DrumPads::OnHelp )
 END_EVENT_TABLE()
 
 // Initializes the application data
@@ -159,10 +162,22 @@ bool DrumPads::Create( wxWindow* parent, wxWindowID id, const wxString& caption,
 {
     _midiInDevice = NULL;
     _midiOutDevice = NULL;
-    wxDialog::Create( parent, id, caption, pos, size, style );
+    _helpCtrl = NULL;
+    wxFrame::Create( parent, id, caption, pos, size, style );
 
     CreateControls();
     Centre();
+
+    wxFileSystem::AddHandler(new wxZipFSHandler());
+    _helpCtrl = new wxHtmlHelpController(wxHF_CONTENTS);
+#ifdef __APPLE__
+    wxString filename = wxString::Format(_("%s/%s"), wxStandardPaths::Get().GetResourcesDir(), _("drumpads.htb"));
+#endif
+    if( !_helpCtrl->AddBook(filename))
+    {
+        wxMessageBox( _("Unable to load help file.  Please make sure that drumpads.htb is in the program directory." ));
+    }
+
 #ifndef __APPLE__
     wxString filepath = _("DrumPads.ico");
 #else
@@ -180,6 +195,16 @@ bool DrumPads::Create( wxWindow* parent, wxWindowID id, const wxString& caption,
  
 bool DrumPads::CreateControls()
 {
+    // Create menu bar (for Mac)
+#ifdef __APPLE__
+    wxMenu* helpMenu = new wxMenu();
+    helpMenu->Append(wxID_HELP);
+    helpMenu->Append(wxID_ABOUT);
+    wxMenuBar* menuBar = new wxMenuBar();
+    menuBar->Append( helpMenu, "&Help" );
+    SetMenuBar(menuBar);
+#endif
+
 	_locked = false;
 	_textColour = *wxWHITE;
 	_backgroundColour.Set(0, 41, 102);
@@ -287,7 +312,7 @@ bool DrumPads::InitializeAudio()
 #ifdef linux
     wxString dirname = wxString(_("./samples"));
 #elif __APPLE__
-    wxString dirname = wxString(_(".\\samples"));
+    wxString dirname = wxString::Format(_("%s/samples/"), wxStandardPaths::Get().GetResourcesDir());
 #else
     wxString dirname = wxString::Format(_("%s/samples"), wxStandardPaths::Get().GetResourcesDir());
 #endif
@@ -328,7 +353,7 @@ bool DrumPads::InitializeAudio()
 #ifndef __APPLE__
 			wxString fileName = wxString::Format(_("samples\\%s"), _waveFileNames[_sampleSetting[i]]);
 #else
-	                wxString fileName = wxString::Format(_("%s/samples/%s"), wxStandardPaths::Get().GetResourcesDir(), _waveFileNames[_sampleSetting[i]]);
+	        wxString fileName = wxString::Format(_("%s/samples/%s"), wxStandardPaths::Get().GetResourcesDir(), _waveFileNames[_sampleSetting[i]]);
 #endif
 			_sample[i] = Mix_LoadWAV(fileName.mb_str().data());
 			if( _sample[i] == NULL )
@@ -532,7 +557,7 @@ void DrumPads::OnLoad( wxCommandEvent& )
 #ifndef __APPLE__
 				wxString fileName = wxString::Format(_("samples\\%s"), _waveFileNames[_sampleSetting[i]]);
 #else
-                                wxString fileName = wxString::Format(_("%s/samples/%s"), wxStandardPaths::Get().GetResourcesDir(), _waveFileNames[_sampleSetting[i]]);
+                wxString fileName = wxString::Format(_("%s/samples/%s"), wxStandardPaths::Get().GetResourcesDir(), _waveFileNames[_sampleSetting[i]]);
 #endif
 				_sample[i] = Mix_LoadWAV(fileName.mb_str().data());
 				wxString title = wxFileName(_waveFileNames[_sampleSetting[i]]).GetName();
@@ -562,6 +587,37 @@ void DrumPads::OnLock( wxCommandEvent& )
 	{
 		_lockButton->SetLabel(wxString(_("Lock Pads")));
 	}
+}
+
+/**
+* Shows about box.
+*/
+void DrumPads::OnInfo( wxCommandEvent& event )
+{
+    // Show about box.
+    wxAboutDialogInfo info;
+    info.SetName(_("DrumPads"));
+    info.SetVersion(_("2.01"));
+    info.SetCopyright(_("(c) 2011-2019 Jason Champion"));
+    info.AddDeveloper(_("Jason Champion"));
+    info.SetIcon(_icon);
+    info.SetLicense(_("DrumPads is copyrighted software and may not be used without a license.."));
+    info.SetWebSite(_("https://zetacentauri.com/software_drumpads.htm"));
+    info.SetDescription(_("DrumPads uses the wxWidgets, SDL, and RtMidi libraries."));
+
+    wxAboutBox(info);
+
+    event.Skip();
+}
+
+/**
+* Shows help file.
+*/
+void DrumPads::OnHelp( wxCommandEvent& event )
+{
+    // Show help file.
+    _helpCtrl->DisplayContents();
+    event.Skip();
 }
 
 /**
@@ -707,7 +763,6 @@ void DrumPads::SelectMidiInputDevice(int number)
         _midiInDevice->openPort(number);
         _midiInDevice->setCallback(MidiMessageHandler, this);
     }
-    //catch( RtMidiError &error )
     catch( RtMidiError &error )
     {
         //wxMessageBox(wxString::FromAscii(error.what()));
