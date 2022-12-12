@@ -39,5 +39,6 @@ DrumPads.exe
 *.user
 *.db
 *.cache
+.vs
 
 .DS_Store
